@@ -12,7 +12,7 @@
 
 **An interactive, presentation-ready web application designed specifically to demonstrate and master Unit V: Django (18 Hours) from *K.A. Lambert, "Fundamentals of Python: first programs", Second Edition*.**
 
-[Live Features](#-live-features--seminar-demos) • [Unit V Syllabus Mapping](#-unit-v-syllabus-mapping) • [Step-by-Step Setup](#-step-by-step-setup-guide) • [Architecture](#-mvt-architecture--er-diagram) • [Seminar Talking Points](#-seminar-presentation-guide) • [Viva Q&A](#-top-viva--seminar-questions)
+[Live Features](#-live-features--seminar-demos) • [Unit V Syllabus Mapping](#-unit-v-syllabus-mapping) • [Step-by-Step Setup](#-step-by-step-setup-guide) • [Admin & CLI Commands](#-admin-credentials--commands-cheat-sheet) • [Architecture](#-mvt-architecture--er-diagram) • [Seminar Talking Points](#-seminar-presentation-guide) • [Viva Q&A](#-top-viva--seminar-questions)
 
 ---
 
@@ -89,6 +89,78 @@ python manage.py runserver
 ```
 
 Now open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your web browser!
+
+---
+
+## 🔐 Admin Credentials & Commands Cheat Sheet
+
+### Default Pre-Configured Staff Accounts
+
+| Role | Username | Password | Status | Admin Privileges |
+| :--- | :--- | :--- | :--- | :--- |
+| **Superuser (Primary)** | `admin` | `admin123` | Active | Full Superuser & Staff Access |
+| **Superuser (Backup)** | `staff` | `staff123` | Active | Full Superuser & Staff Access |
+
+> **⚠️ Note on Case Sensitivity:**  
+> Django usernames and passwords are case-sensitive. Enter them in all lowercase without trailing spaces.
+
+---
+
+### 🔑 Admin & User Management Commands
+
+#### 1. Change an Existing Admin Password
+To change the password for `admin` or any user directly from your terminal:
+```bash
+python manage.py changepassword admin
+```
+*You will be prompted to enter and confirm your new password in the terminal.*
+
+#### 2. Create a Brand New Superuser Account
+If you ever want to create an entirely new administrator account interactively:
+```bash
+python manage.py createsuperuser
+```
+*Follow the interactive prompts to provide a username, email address, and password.*
+
+#### 3. Reset / Unlock an Account via Python Shell
+If you ever need to reset a password programmatically via the interactive Django shell:
+```bash
+python manage.py shell
+```
+Inside the interactive shell:
+```python
+from django.contrib.auth.models import User
+user = User.objects.get(username='admin')
+user.set_password('my_new_secure_password')
+user.is_staff = True
+user.is_superuser = True
+user.save()
+exit()
+```
+
+---
+
+### 🛠️ Complete Django CLI Commands Reference
+
+Here is a master cheat sheet of every essential Django command used throughout the project and seminar:
+
+| Command | Category | Description & Usage |
+| :--- | :--- | :--- |
+| `python manage.py runserver` | **Server** | Starts the local lightweight development web server on `http://127.0.0.1:8000/`. |
+| `python manage.py runserver 8080` | **Server** | Starts the web server on a custom port (e.g., `8080`). |
+| `python manage.py makemigrations courses` | **Database** | Inspects `courses/models.py` and creates Python migration blueprint files. |
+| `python manage.py migrate` | **Database** | Executes DDL SQL statements to apply pending migrations to `db.sqlite3`. |
+| `python manage.py showmigrations` | **Database** | Displays the status of all applied and unapplied migrations across all apps. |
+| `python manage.py sqlmigrate courses 0001` | **Database** | Prints the exact raw SQL statements that will be executed for migration `0001`. Great for demonstrating ORM SQL generation during seminars! |
+| `python manage.py dbshell` | **Database** | Opens the SQLite command-line client directly connected to `db.sqlite3`. |
+| `python populate_data.py` | **Data Seed** | Populates courses, instructors, categories, reviews, and ensures default admin users exist. |
+| `python manage.py changepassword <user>` | **Auth** | Changes the password for the specified user account. |
+| `python manage.py createsuperuser` | **Auth** | Interactively creates a new superuser with administrative privileges. |
+| `python manage.py test courses` | **Testing** | Runs all automated unit and integration tests defined in `courses/tests.py`. |
+| `python manage.py check` | **Diagnostics**| Inspects the entire Django project for configuration or syntax errors without running the server. |
+| `python manage.py shell` | **Interactive**| Launches an interactive Python REPL with Django models and settings pre-loaded. |
+| `python manage.py startapp <app_name>` | **Scaffolding**| Scaffolds a new modular Django application directory structure. |
+| `django-admin startproject <name> .` | **Scaffolding**| Creates the root project configuration files (`settings.py`, `urls.py`, `wsgi.py`). |
 
 ---
 
