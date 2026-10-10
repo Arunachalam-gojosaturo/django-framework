@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Function-Based View (FBV) Demo | EduPulse{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+        <span class="px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-xs font-semibold uppercase">
+            {{ view_type }}
+        </span>
+        <h1 class="text-2xl font-bold text-white">Function-Based View: course_list_fbv()</h1>
+        <p class="text-sm text-slate-300">
+            This page is rendered using a standard Python function: <code class="text-amber-400 font-mono">def course_list_fbv(request): return render(...)</code>. In your seminar, compare this with <code class="text-blue-400 font-mono">CourseListView(ListView)</code> to explain how Django CBVs reduce boilerplate code!
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for course in courses %}
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
+            <h3 class="text-base font-bold text-white">
+                <a href="{% url 'courses:course_detail_fbv' slug=course.slug %}" class="hover:text-amber-400">
+                    {{ course.title }}
+                </a>
+            </h3>
+            <p class="text-xs text-slate-400">{{ course.summary }}</p>
+            <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+                <span class="text-slate-500">{{ course.instructor.name }}</span>
+                <a href="{% url 'courses:course_detail_fbv' slug=course.slug %}" class="text-amber-400 font-medium">FBV Detail &rarr;</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

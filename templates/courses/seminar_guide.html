@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Seminar Presentation Guide | Django Unit V{% endblock %}
+
+{% block content %}
+<div class="space-y-8 max-w-5xl mx-auto">
+
+    <!-- Seminar Header Card -->
+    <div class="p-8 rounded-3xl bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950 border border-blue-700/50 shadow-2xl relative overflow-hidden">
+        <div class="space-y-3">
+            <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-bold uppercase tracking-wider">
+                College Seminar Presentation Deck
+            </span>
+            <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                Unit V: Python Django Web Framework
+            </h1>
+            <p class="text-sm text-slate-300 max-w-2xl leading-relaxed">
+                Comprehensive slide deck and seminar walkthrough covering all 8 curriculum topics from <em>K.A. Lambert, "Fundamentals of Python: first programs", Second Edition (Unit V: 18 Hours)</em>.
+            </p>
+        </div>
+        
+        <div class="mt-6 flex flex-wrap gap-3 text-xs">
+            <a href="{% url 'courses:course_list' %}" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-white shadow-lg transition">
+                🚀 Launch Live App
+            </a>
+            <a href="{% url 'courses:queryset_explorer' %}" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-white shadow-lg transition">
+                ⚡ Open QuerySet Explorer
+            </a>
+            <a href="/admin/" target="_blank" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white shadow-lg transition">
+                🛠️ Open Django Admin
+            </a>
+        </div>
+    </div>
+
+    <!-- MVT Architectural Flow Diagram -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <span>📐</span> Django Architecture: The MVT Pattern
+        </h2>
+        <p class="text-xs text-slate-400">
+            Explain this fundamental diagram first to your audience: Django uses <strong>Model-View-Template (MVT)</strong> architecture, where the Controller role is handled by the framework itself through the URL dispatcher.
+        </p>
+
+        <!-- Visual ASCII/CSS Flowchart -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+            <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
+                <div class="w-8 h-8 mx-auto rounded-lg bg-blue-500/20 text-blue-400 font-bold flex items-center justify-center text-xs">1</div>
+                <div class="text-xs font-bold text-white">Browser Request</div>
+                <div class="text-[11px] text-slate-400">User visits URL in web browser</div>
+                <div class="text-[11px] font-mono text-blue-400">urls.py</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
+                <div class="w-8 h-8 mx-auto rounded-lg bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-xs">2</div>
+                <div class="text-xs font-bold text-white">View Logic</div>
+                <div class="text-[11px] text-slate-400">Fetches data & handles business logic</div>
+                <div class="text-[11px] font-mono text-indigo-400">views.py</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
+                <div class="w-8 h-8 mx-auto rounded-lg bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs">3</div>
+                <div class="text-xs font-bold text-white">Model (ORM)</div>
+                <div class="text-[11px] text-slate-400">Interacts with SQLite database</div>
+                <div class="text-[11px] font-mono text-emerald-400">models.py</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
+                <div class="w-8 h-8 mx-auto rounded-lg bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-xs">4</div>
+                <div class="text-xs font-bold text-white">Template (HTML)</div>
+                <div class="text-[11px] text-slate-400">Renders response back to user</div>
+                <div class="text-[11px] font-mono text-amber-400">*.html</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The 8 Unit V Syllabus Topics - Slide by Slide -->
+    <div class="space-y-6">
+        <h2 class="text-xl font-bold text-white">Detailed Topic-by-Topic Seminar Walkthrough</h2>
+
+        <!-- Topic 1 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Topic 1</span>
+                <span class="text-xs text-slate-500 font-mono">Environment Setup</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Installing Django</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Speaker Talking Point:</strong> Explain virtual environments and pip packaging. Django is installed via Python's package manager:
+            </p>
+            <pre class="bg-slate-950 p-3 rounded-xl text-xs font-mono text-emerald-400 border border-slate-800">python3 -m venv .venv
+source .venv/bin/activate
+pip install django
+python -m django --version</pre>
+        </div>
+
+        <!-- Topic 2 & 3 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Topics 2 & 3</span>
+                <span class="text-xs text-slate-500 font-mono">Project vs App Architecture</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Project Creation & Building an Application</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Speaker Talking Point:</strong> A <em>project</em> represents the entire web configuration, while an <em>app</em> is a self-contained module that does one job (reusable component).
+            </p>
+            <pre class="bg-slate-950 p-3 rounded-xl text-xs font-mono text-emerald-400 border border-slate-800"># 1. Create root configuration project
+django-admin startproject config .
+
+# 2. Create the modular application
+python manage.py startapp courses
+
+# 3. Register 'courses' inside config/settings.py under INSTALLED_APPS</pre>
+        </div>
+
+        <!-- Topic 4 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Topic 4</span>
+                <span class="text-xs text-slate-500 font-mono">ORM & Data Modeling</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Designing the Data Schema</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Speaker Talking Point:</strong> Highlight how Django ORM models map Python classes to SQL tables without writing raw SQL. Point to <code class="text-indigo-400">courses/models.py</code>:
+            </p>
+            <ul class="list-disc list-inside text-xs text-slate-300 space-y-1">
+                <li><code class="text-blue-300 font-mono">Category</code>: CharField, unique SlugField.</li>
+                <li><code class="text-blue-300 font-mono">Instructor</code>: EmailField, CharField, TextField.</li>
+                <li><code class="text-blue-300 font-mono">Course</code>: ForeignKey to Category and Instructor with <code class="text-amber-300 font-mono">on_delete=models.CASCADE</code> and choices for status and difficulty.</li>
+                <li><code class="text-blue-300 font-mono">Review</code>: Reverse relational model for user feedback.</li>
+            </ul>
+            <pre class="bg-slate-950 p-3 rounded-xl text-xs font-mono text-emerald-400 border border-slate-800">python manage.py makemigrations  # Generates SQL migration blueprint
+python manage.py migrate         # Applies tables to SQLite db.sqlite3</pre>
+        </div>
+
+        <!-- Topic 5 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Topic 5</span>
+                <span class="text-xs text-slate-500 font-mono">Admin Site</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Creating an Administration Site for Models</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Speaker Talking Point:</strong> Django provides an automatic, production-grade administration panel. We customize it in <code class="text-indigo-400">admin.py</code>:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                    <strong class="text-white">list_display:</strong> Columns visible in table
+                </div>
+                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                    <strong class="text-white">list_filter:</strong> Right-hand faceted sidebar filter
+                </div>
+                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                    <strong class="text-white">search_fields:</strong> Instant full-text search box
+                </div>
+                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                    <strong class="text-white">prepopulated_fields:</strong> Auto-slug generation from title
+                </div>
+            </div>
+            <p class="text-xs text-slate-400">
+                Live Login credentials: Username: <code class="text-emerald-400">admin</code> &bull; Password: <code class="text-emerald-400">admin123</code>
+            </p>
+        </div>
+
+        <!-- Topics 6 & 7 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Topics 6 & 7</span>
+                <span class="text-xs text-slate-500 font-mono">ORM Operations</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Working with QuerySets, Managers & Retrieving Objects</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Speaker Talking Point:</strong> Live demo using the QuerySet Explorer tab! Explain:
+            </p>
+            <ul class="list-disc list-inside text-xs text-slate-300 space-y-1">
+                <li><strong>Default Manager:</strong> <code class="text-blue-300 font-mono">Course.objects.all()</code></li>
+                <li><strong>Custom Manager:</strong> <code class="text-indigo-300 font-mono">Course.published.all()</code> (filters <code class="font-mono">status='published'</code>)</li>
+                <li><strong>Lazy Evaluation:</strong> QuerySets do not query SQLite until iterated or sliced.</li>
+                <li><strong>Retrieving Single Object:</strong> <code class="text-amber-300 font-mono">Course.objects.get(id=1)</code> vs <code class="text-emerald-300 font-mono">get_object_or_404(Course, slug=...)</code></li>
+            </ul>
+        </div>
+
+        <!-- Topic 8 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Topic 8</span>
+                <span class="text-xs text-slate-500 font-mono">Views & Presentation</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Building List and Detail Views</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Speaker Talking Point:</strong> Show how Django simplifies web development with Generic Class-Based Views:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+                    <strong class="text-blue-400 font-mono">CourseListView (ListView)</strong>
+                    <p class="text-slate-400">Queries database, handles pagination, renders list template.</p>
+                </div>
+                <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+                    <strong class="text-indigo-400 font-mono">CourseDetailView (DetailView)</strong>
+                    <p class="text-slate-400">Extracts slug from URL route, loads single course, increments view counter.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Viva / Seminar Q&A Prep -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <span>❓</span> Common Viva & Seminar Questions (With Answers)
+        </h2>
+        <div class="space-y-4 text-xs">
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <p class="font-bold text-white">Q1: What is the difference between MVC and Django's MVT?</p>
+                <p class="text-slate-300">In MVC, the Controller handles incoming requests. In Django's MVT, the framework itself acts as the controller via <code class="text-blue-400 font-mono">urls.py</code>, while the View contains business logic and the Template formats the presentation.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <p class="font-bold text-white">Q2: What is lazy evaluation in QuerySets?</p>
+                <p class="text-slate-300">Creating a QuerySet does not touch the database immediately. Django executes the database query only when the QuerySet is evaluated (e.g. in a <code class="font-mono">for</code> loop in templates or with <code class="font-mono">list()</code>, <code class="font-mono">len()</code>, or <code class="font-mono">count()</code>).</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <p class="font-bold text-white">Q3: Why use a Custom Manager in Django models?</p>
+                <p class="text-slate-300">To encapsulate common filtering logic (like <code class="text-indigo-400 font-mono">Course.published.all()</code>) directly inside the model API, keeping views clean and DRY (Don't Repeat Yourself).</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

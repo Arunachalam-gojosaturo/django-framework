@@ -1,0 +1,12 @@
+<tr class="hover:bg-slate-800/40 transition">
+    <td class="px-6 py-3.5 text-slate-400 whitespace-nowrap">{{ item.time }}</td>
+    <td class="px-6 py-3.5 whitespace-nowrap">
+        <span class="px-2 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-medium">{{ item.event_type }}</span>
+    </td>
+    <td class="px-6 py-3.5 text-slate-300 truncate max-w-xs">{{ item.target }}</td>
+    <td class="px-6 py-3.5 whitespace-nowrap">
+        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border inline-flex items-center gap-1">{{ item.status }}</span>
+    </td>
+    <td class="px-6 py-3.5 text-slate-300 whitespace-nowrap">{{ item.http_code }}</td>
+    <td class="px-6 py-3.5 text-slate-300 whitespace-nowrap">{{ item.latency }} ms</td>
+</tr>

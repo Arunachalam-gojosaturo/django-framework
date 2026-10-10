@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}Live Operations Console | PulseStream{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Top Hero Banner & Controls -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2 border-b border-slate-800">
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                Operational Telemetry Console
+            </h1>
+            <p class="text-sm text-slate-400 mt-1">
+                Real-time WebSocket event feed, circuit health metrics, and automated webhook dispatch telemetry.
+            </p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button 
+                @click="simulateEvent()" 
+                :disabled="isSimulating"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-sm font-semibold shadow-lg shadow-indigo-600/25 transition disabled:opacity-50">
+                <svg x-show="!isSimulating" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <svg x-show="isSimulating" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span x-text="isSimulating ? 'Ingesting...' : 'Ingest Test Event'"></span>
+            </button>
+
+            <button 
+                @click="clearEvents()" 
+                class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition border border-slate-700">
+                Clear Console
+            </button>
+        </div>
+    </div>
+
+    <!-- 4 High-Impact KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Ingested Events -->
+        <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Events Ingested</span>
+                <span class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-white font-mono" x-text="stats.totalIngested">0</span>
+                <span class="text-xs text-indigo-400 font-medium">+100% async</span>
+            </div>
+        </div>
+
+        <!-- Dispatched Webhooks -->
+        <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Dispatches</span>
+                <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-emerald-400 font-mono" x-text="stats.totalDispatched">0</span>
+                <span class="text-xs text-emerald-400 font-medium">Delivered</span>
+            </div>
+        </div>
+
+        <!-- Success Rate -->
+        <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Success Rate</span>
+                <span class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-white font-mono" x-text="stats.successRate + '%'">100%</span>
+                <span class="text-xs text-cyan-400 font-medium">Zero-Drop DLQ</span>
+            </div>
+        </div>
+
+        <!-- Average Latency -->
+        <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Avg Roundtrip</span>
+                <span class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-white font-mono" x-text="stats.avgLatency + ' ms'">0 ms</span>
+                <span class="text-xs text-slate-400 font-medium">p95 target</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Stream Table & Visual Inspector -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <!-- Table Header & Controls -->
+        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <h2 class="text-base font-bold text-white">Live Inbound & Outbound Pipeline</h2>
+                </div>
+                <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700" x-text="events.length + ' events buffered'"></span>
+            </div>
+            <div class="text-xs text-slate-400">
+                Connected Room: <code class="text-indigo-400 font-mono">telemetry_demo-org</code>
+            </div>
+        </div>
+
+        <!-- Table Stream -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-800/80 text-left text-sm">
+                <thead class="bg-slate-950/60 text-xs uppercase font-semibold text-slate-400 tracking-wider">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Time</th>
+                        <th scope="col" class="px-6 py-3">Event Type</th>
+                        <th scope="col" class="px-6 py-3">Destination / Target</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3">HTTP Code</th>
+                        <th scope="col" class="px-6 py-3">Latency</th>
+                        <th scope="col" class="px-6 py-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/50 font-mono text-xs">
+                    <template x-for="(item, index) in events" :key="index">
+                        <tr class="hover:bg-slate-800/40 transition">
+                            <td class="px-6 py-3.5 text-slate-400 whitespace-nowrap" x-text="item.time"></td>
+                            <td class="px-6 py-3.5 whitespace-nowrap">
+                                <span class="px-2 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-medium" x-text="item.event_type"></span>
+                            </td>
+                            <td class="px-6 py-3.5 text-slate-300 truncate max-w-xs" x-text="item.target || 'Inbound Ingestion Gateway'"></td>
+                            <td class="px-6 py-3.5 whitespace-nowrap">
+                                <span :class="{
+                                    'bg-emerald-500/20 text-emerald-400 border-emerald-500/30': item.status === 'DELIVERED' || item.status === 'SUCCESS',
+                                    'bg-amber-500/20 text-amber-400 border-amber-500/30': item.status === 'PROCESSING' || item.status === 'RETRYING',
+                                    'bg-rose-500/20 text-rose-400 border-rose-500/30': item.status === 'FAILED',
+                                    'bg-indigo-500/20 text-indigo-400 border-indigo-500/30': item.status === 'INGESTED'
+                                }" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border inline-flex items-center gap-1">
+                                    <span x-text="item.status"></span>
+                                </span>
+                            </td>
+                            <td class="px-6 py-3.5 text-slate-300 whitespace-nowrap" x-text="item.http_code || '202'"></td>
+                            <td class="px-6 py-3.5 text-slate-300 whitespace-nowrap" x-text="item.latency ? item.latency + ' ms' : '< 1 ms'"></td>
+                            <td class="px-6 py-3.5 whitespace-nowrap">
+                                <button @click="inspectPayload(item)" class="text-indigo-400 hover:text-indigo-300 font-sans hover:underline text-xs">
+                                    Inspect
+                                </button>
+                            </td>
+                        </tr>
+                    </template>
+
+                    <tr x-show="events.length === 0">
+                        <td colspan="7" class="px-6 py-12 text-center text-slate-500 font-sans">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                                <span>No events buffered yet. Click "Ingest Test Event" above to fire a sample payload!</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Inspector Modal -->
+    <div x-show="modalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" @keydown.escape.window="modalOpen = false">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative space-y-4" @click.outside="modalOpen = false">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    Event Details & Payload Inspector
+                </h3>
+                <button @click="modalOpen = false" class="text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div>
+                <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-emerald-400 overflow-x-auto border border-slate-800 max-h-96" x-text="JSON.stringify(activeItem, null, 2)"></pre>
+            </div>
+            <div class="flex justify-end">
+                <button @click="modalOpen = false" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EduPulse | Django Unit V Demonstration Portal{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Logo & Unit Title -->
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'courses:course_list' %}" class="flex items-center space-x-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="text-lg font-bold tracking-tight text-white">EduPulse</span>
+                            <span class="hidden sm:inline-block ml-2 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Unit V: Django</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="flex items-center space-x-1 sm:space-x-3">
+                    <a href="{% url 'courses:course_list' %}" class="text-sm font-medium text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-slate-800 transition flex items-center gap-1.5">
+                        <span>Courses (List View)</span>
+                    </a>
+                    <a href="{% url 'courses:queryset_explorer' %}" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 px-3 py-2 rounded-lg hover:bg-indigo-950/40 border border-indigo-500/20 transition flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+                        <span>QuerySet Explorer</span>
+                    </a>
+                    <a href="{% url 'courses:seminar_guide' %}" class="text-sm font-medium text-amber-400 hover:text-amber-300 px-3 py-2 rounded-lg hover:bg-amber-950/40 border border-amber-500/20 transition flex items-center gap-1.5">
+                        <span>🎙️ Seminar Deck</span>
+                    </a>
+                    <a href="/admin/" target="_blank" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center gap-1 shadow-md shadow-emerald-600/20">
+                        <span>Admin Site</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages Container -->
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+        {% for message in messages %}
+        <div class="p-4 rounded-xl border flex items-center justify-between text-sm {% if message.tags == 'success' %}bg-emerald-950/60 border-emerald-800 text-emerald-200{% else %}bg-rose-950/60 border-rose-800 text-rose-200{% endif %}">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Page Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-6 text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+                <p class="font-medium text-slate-300">EduPulse — University Seminar Project for Python Django (Unit V)</p>
+                <p class="text-slate-500 mt-0.5">Syllabus: K.A. Lambert, "Fundamentals of Python: first programs", Second Edition (Unit V: 18 Hours).</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'courses:queryset_explorer' %}" class="hover:text-blue-400 transition">QuerySets</a>
+                <span class="text-slate-700">•</span>
+                <a href="{% url 'courses:course_list_fbv' %}" class="hover:text-blue-400 transition">FBV Comparison</a>
+                <span class="text-slate-700">•</span>
+                <a href="/admin/" class="hover:text-emerald-400 transition">Admin Panel</a>
+                <span class="text-slate-700">•</span>
+                <a href="{% url 'courses:seminar_guide' %}" class="hover:text-amber-400 transition">Presentation Notes</a>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

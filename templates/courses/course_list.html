@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Course Catalog (List View) | EduPulse Django Unit V{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Seminar Concept Highlight Banner -->
+    <div class="p-5 rounded-2xl bg-gradient-to-r from-blue-950/70 via-indigo-950/50 to-slate-900 border border-blue-800/40 shadow-xl relative overflow-hidden">
+        <div class="max-w-3xl space-y-2">
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-semibold uppercase tracking-wider">
+                    Syllabus Concept: Building List and Detail Views
+                </span>
+                <span class="text-xs text-slate-400 font-mono">View: CourseListView (django.views.generic.ListView)</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Course Catalog & Learning Portal
+            </h1>
+            <p class="text-sm text-slate-300 leading-relaxed">
+                Rendered using Django's generic <code class="text-blue-300 font-mono">ListView</code>. It demonstrates model querying, Custom Manager <code class="text-indigo-300 font-mono">Course.published.all()</code>, category relational filtering, keyword searching, and cursor pagination.
+            </p>
+        </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4">
+        <form method="get" action="{% url 'courses:course_list' %}" class="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+            <!-- Search Input -->
+            <div class="relative flex-1">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="{{ search_query }}"
+                    placeholder="Search by course title, topic, or instructor..."
+                    class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-white placeholder-slate-500 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                >
+                <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+
+            <!-- Difficulty Filter -->
+            <select name="difficulty" class="px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="">All Difficulties</option>
+                <option value="beginner" {% if selected_difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+                <option value="intermediate" {% if selected_difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                <option value="advanced" {% if selected_difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+            </select>
+
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-md shadow-blue-600/25 transition">
+                Filter Courses
+            </button>
+
+            {% if selected_category or selected_difficulty or search_query %}
+            <a href="{% url 'courses:course_list' %}" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition text-center">
+                Reset
+            </a>
+            {% endif %}
+        </form>
+
+        <!-- Category Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 pt-1 text-xs">
+            <span class="text-slate-400 font-medium">Categories:</span>
+            <a href="{% url 'courses:course_list' %}" 
+               class="px-3 py-1.5 rounded-lg border transition whitespace-nowrap {% if not selected_category %}bg-blue-600 border-blue-500 text-white font-semibold{% else %}bg-slate-950 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700{% endif %}">
+                All ({{ total_published }})
+            </a>
+            {% for cat in categories %}
+            <a href="?category={{ cat.slug }}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" 
+               class="px-3 py-1.5 rounded-lg border transition whitespace-nowrap {% if selected_category == cat.slug %}bg-blue-600 border-blue-500 text-white font-semibold{% else %}bg-slate-950 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700{% endif %}">
+                {{ cat.name }} ({{ cat.total_courses }})
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Course Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for course in courses %}
+        <div class="rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 shadow-md hover:shadow-xl transition flex flex-col justify-between overflow-hidden group">
+            <div class="p-5 space-y-3">
+                <!-- Badges: Category & Difficulty -->
+                <div class="flex items-center justify-between text-xs">
+                    <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 font-medium border border-blue-500/20">
+                        {{ course.category.name }}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-md font-mono text-[11px] uppercase tracking-wide {% if course.difficulty == 'beginner' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% elif course.difficulty == 'intermediate' %}bg-amber-500/10 text-amber-400 border border-amber-500/20{% else %}bg-rose-500/10 text-rose-400 border border-rose-500/20{% endif %}">
+                        {{ course.difficulty }}
+                    </span>
+                </div>
+
+                <!-- Course Title & Link to Detail View -->
+                <h3 class="text-lg font-bold text-white group-hover:text-blue-400 transition leading-snug">
+                    <a href="{{ course.get_absolute_url }}">
+                        {{ course.title }}
+                    </a>
+                </h3>
+
+                <!-- Short Summary -->
+                <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                    {{ course.summary }}
+                </p>
+
+                <!-- Instructor Info -->
+                <div class="pt-2 flex items-center gap-2 text-xs text-slate-300">
+                    <div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center font-bold text-blue-400 text-[10px]">
+                        {{ course.instructor.name|slice:":1" }}
+                    </div>
+                    <span>{{ course.instructor.name }}</span>
+                </div>
+            </div>
+
+            <!-- Card Bottom Bar -->
+            <div class="px-5 py-3.5 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-3 text-slate-400 font-mono">
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        {{ course.views_count }} views
+                    </span>
+                    <span class="flex items-center gap-1 text-amber-400">
+                        ★ {{ course.avg_rating|floatformat:1|default:"5.0" }} ({{ course.review_count|default:"0" }})
+                    </span>
+                </div>
+
+                <a href="{{ course.get_absolute_url }}" class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 font-semibold group-hover:translate-x-0.5 transition">
+                    <span>View Detail</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full p-12 text-center rounded-2xl bg-slate-900/40 border border-slate-800 text-slate-400">
+            <svg class="w-10 h-10 mx-auto text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-base font-semibold text-slate-300">No courses found matching your criteria</p>
+            <p class="text-xs text-slate-500 mt-1">Try resetting filters or adding new courses from the Django Admin site.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if is_paginated %}
+    <div class="pt-4 flex items-center justify-between border-t border-slate-800 text-xs">
+        <div class="text-slate-400">
+            Page <span class="font-bold text-white">{{ page_obj.number }}</span> of <span class="font-bold text-white">{{ page_obj.paginator.num_pages }}</span>
+        </div>
+        <div class="flex items-center space-x-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium transition">
+                &larr; Previous
+            </a>
+            {% endif %}
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium transition">
+                Next &rarr;
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

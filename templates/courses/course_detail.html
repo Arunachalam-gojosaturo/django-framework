@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} | EduPulse Detail View{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Breadcrumb & Back Link -->
+    <div class="flex items-center justify-between text-xs text-slate-400">
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'courses:course_list' %}" class="hover:text-white transition">&larr; Back to Course Catalog</a>
+            <span>/</span>
+            <span class="text-slate-500">{{ course.category.name }}</span>
+            <span>/</span>
+            <span class="text-slate-300 font-medium truncate max-w-xs">{{ course.title }}</span>
+        </div>
+        <div class="hidden sm:flex items-center gap-2 font-mono text-[11px] bg-slate-900 px-3 py-1 rounded-full border border-slate-800">
+            <span class="text-blue-400">DetailView:</span>
+            <span>slug = "{{ course.slug }}"</span>
+        </div>
+    </div>
+
+    <!-- Main Grid: Course Details & Sidebar -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+        <!-- Left 2 Cols: Course Overview & Curriculum -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Header Card -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-4 shadow-xl">
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <span class="px-3 py-1 rounded-md bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/20">
+                        {{ course.category.name }}
+                    </span>
+                    <span class="px-2.5 py-1 rounded-md uppercase font-mono text-[11px] tracking-wide {% if course.difficulty == 'beginner' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% elif course.difficulty == 'intermediate' %}bg-amber-500/10 text-amber-400 border border-amber-500/20{% else %}bg-rose-500/10 text-rose-400 border border-rose-500/20{% endif %}">
+                        {{ course.difficulty }}
+                    </span>
+                    <span class="text-slate-500">•</span>
+                    <span class="text-slate-400 font-mono text-[11px]">{{ course.views_count }} views recorded</span>
+                </div>
+
+                <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                    {{ course.title }}
+                </h1>
+
+                <p class="text-base text-slate-300 leading-relaxed">
+                    {{ course.summary }}
+                </p>
+
+                <!-- Instructor Info Ribbon -->
+                <div class="pt-4 border-t border-slate-800 flex items-center justify-between flex-wrap gap-4 text-xs">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
+                            {{ course.instructor.name|slice:":1" }}
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-sm">{{ course.instructor.name }}</div>
+                            <div class="text-slate-400">{{ course.instructor.title }} &bull; {{ course.instructor.email }}</div>
+                        </div>
+                    </div>
+
+                    <div class="text-right">
+                        <div class="text-xs text-slate-400">Course Fee</div>
+                        <div class="text-xl font-extrabold text-emerald-400 font-mono">
+                            {% if course.price > 0 %}${{ course.price }}{% else %}Free / Open{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Content / Syllabus Section -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Curriculum & Course Outline
+                </h2>
+                <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line bg-slate-950/60 p-5 rounded-xl border border-slate-800/80 font-sans">
+                    {{ course.content }}
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Student Reviews & Feedback</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Average Rating: <span class="text-amber-400 font-bold">★ {{ avg_rating|floatformat:1 }}</span> ({{ reviews.count }} reviews)</p>
+                    </div>
+                </div>
+
+                <!-- Add Review Form -->
+                <div class="bg-slate-950/80 p-5 rounded-xl border border-slate-800 space-y-3">
+                    <h3 class="text-sm font-semibold text-white">Leave a Review (Form Handling)</h3>
+                    <form method="post" action="{% url 'courses:add_review' slug=course.slug %}" class="space-y-3">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Your Name</label>
+                                {{ form.student_name }}
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Rating</label>
+                                {{ form.rating }}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Your Feedback</label>
+                            {{ form.comment }}
+                        </div>
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-md transition">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Reviews Feed -->
+                <div class="space-y-3">
+                    {% for rev in reviews %}
+                    <div class="p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-white">{{ rev.student_name }}</span>
+                            <span class="text-amber-400 font-bold font-mono">{{ rev.rating }} ★</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">{{ rev.comment }}</p>
+                        <div class="text-[10px] text-slate-500 font-mono">{{ rev.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    {% empty %}
+                    <p class="text-xs text-slate-500 text-center py-4">No reviews submitted yet. Be the first to share your thoughts!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Col: Instructor Profile & Related Courses -->
+        <div class="space-y-6">
+            <!-- Instructor Profile Card -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider text-slate-400">About the Instructor</h3>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400 text-base">
+                        {{ course.instructor.name|slice:":1" }}
+                    </div>
+                    <div>
+                        <div class="font-bold text-white text-base">{{ course.instructor.name }}</div>
+                        <div class="text-xs text-blue-400">{{ course.instructor.title }}</div>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    {{ course.instructor.bio }}
+                </p>
+            </div>
+
+            <!-- Related Courses (Same Category) -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider text-slate-400">Related Courses</h3>
+                <div class="space-y-3">
+                    {% for rel in related_courses %}
+                    <a href="{{ rel.get_absolute_url }}" class="block p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-blue-500/40 transition group">
+                        <div class="text-xs font-semibold text-white group-hover:text-blue-400 transition leading-snug">
+                            {{ rel.title }}
+                        </div>
+                        <div class="mt-1 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                            <span>{{ rel.difficulty }}</span>
+                            <span class="text-emerald-400">${{ rel.price }}</span>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <p class="text-xs text-slate-500">No other courses in this category yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Quick Edit in Admin -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-xs text-slate-400 space-y-2">
+                <div class="font-semibold text-white flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    Django Admin Shortcut
+                </div>
+                <p>Modify or unpublish this course directly from the built-in administration site.</p>
+                <a href="/admin/courses/course/{{ course.id }}/change/" target="_blank" class="inline-block mt-1 text-emerald-400 hover:underline font-medium">
+                    Edit in Django Admin &rarr;
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
